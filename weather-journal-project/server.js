@@ -32,7 +32,7 @@ function listening() {
 
 //get function
 
-app.get("/allData", sendData);
+app.get("/getData", sendData);
 
 function sendData(request, response) {
   response.send(projectData);

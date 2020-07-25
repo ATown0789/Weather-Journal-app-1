@@ -1,7 +1,7 @@
 /* Global Variables */
 const tempElement = document.getElementById("temp");
 const dateElement = document.getElementById("date");
-const clientRElement = document.getElementById("clientR");
+const clientRElement = document.getElementById("content");
 // Create a new date instance dynamically with JS
 let date = new Date();
 let newDate =
@@ -14,9 +14,10 @@ let apiKey = "&appid=760e49c72462254c7acebcc4aaabf805";
 
 // Function to GET Web API Data
 const getWeather = async (baseURL, zip, apiKey) => {
-  const response = await fetch(baseURL + zip + apiKey);
+  const res = await fetch(baseURL + zip + apiKey);
   try {
     const data = await res.json();
+	console.log('getWeather data',data);
     return data;
   } catch (error) {
     console.log("error", error);
@@ -31,19 +32,21 @@ generate.addEventListener("click", performAction);
 function performAction(e) {
   const zip = document.getElementById("zip").value;
   const feel = document.getElementById("feelings").value;
-  getWeather(baseURL, zip, apiKey).then((data) => {
-    postData("/addData", {
-      temp: data.main.temp,
-      date: newDate,
-      userRes: feel,
-    });
-    updateUI();
-  });
+  getWeather(baseURL, zip, apiKey)
+	.then((data) => {
+		postData("http:localhost:8000/addData", {
+		  temp: data.main.temp,
+		  date: newDate,
+		  userRes: feel,
+		});
+		console.log('feel',feel);
+		updateUI(data.main.temp,date,feel);
+	});
 }
 
 // Function to POST data
 const postData = async (url = "", data = {}) => {
-  console.log(data);
+  console.log('postData data',data);
   const response = await fetch(url, {
     method: "POST",
     credentials: "same-origin",
@@ -64,16 +67,9 @@ const postData = async (url = "", data = {}) => {
 
 // postData('/add', {})
 // Function to GET Project Data and update UI
-const updateUI = async () => {
-  const request = await fetch("/getData");
-  try {
-    const weatherData = await req.json();
-    console.log(weatherData);
-    const index = weatherData.length - 1;
-    temp.textContent = weatherData[index].temp;
-    dateEl.textContent = weatherData[index].date;
-    userResEl.textContent = weatherData[index].clientR;
-  } catch (error) {
-    console.log("error", error);
-  }
+const updateUI = async (weatherData, date, feel) => {
+	console.log('feel', feel);
+    temp.textContent = weatherData;
+    dateElement.textContent = date;
+   clientRElement.textContent = feel;
 };
